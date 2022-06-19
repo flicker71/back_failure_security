@@ -66,9 +66,13 @@ app.get(apiUrlUser, async (req, res) => {
 
 
 app.post(apiUrlLogin, async (req, res) => {
+  //Option 1 pour l'injection sql qui ne fonctionne pas totalement car je n'arrive pas à générer les informations dans mon token
+  //l'injection avec ';-- ou // fonctionne
+  //l'injection avec 'password' or 1=1 fonctionne, il me génère un jwt vide car je n'arrive pas à passer les data dans le payload ligne 90
   con.connect();
-  const query = `SELECT * FROM users where mail = ${req.body.mail} and password = 'test'"`;
-  let result = query(query);
+  const query = `SELECT * FROM users where mail = '${req.body.mail}' and password = ${req.body.password}`;
+
+//Option 2 qui ne fonctionne pas car il ne prend pas en compte les commentaires
   // con.connect();
   
   // con.connect(function (err) {
@@ -76,13 +80,15 @@ app.post(apiUrlLogin, async (req, res) => {
   //   // console.log('SELECT * FROM users where mail = "çagratte@gmail.com')//;-- and password = "' + req.body.password + '"');
   //   // console.log("SELECT * FROM users where mail = '" + req.body.mail + "' and password = 'test'");
 
-  //   con.query("SELECT * FROM users where mail = '" + req.body.mail + "' and password = '" + req.body.password + "'", async function (err, result) {
+  //   con.query("SELECT * FROM users where mail = '" + req.body.mail + "' and password = '" + req.body.password + "'", 
+  //   async function (err, result) {
   //     console.log(result)
   //     console.log('err' ,  err)
   
-      console.log('query ', result)
+      // console.log('query ', query)
       if (query) {
         const jsontoken = await signAccessToken({ mail: query[0].mail, password: query[0].password, username: query[0].username, firstName: query[0].first_name, lastName: query[0].last_name });
+        // const jsontoken = await signAccessToken({ mail: result[0].mail, password: result[0].password, username: result[0].username, firstName: result[0].first_name, lastName: result[0].last_name });
         console.log(jsontoken)
         res.json({
           success: 1,
