@@ -48,3 +48,4 @@ résultat de npm list -g
 ├── typeorm@0.2.45
 └── yarn@1.22.17
 
+Fichier sql à la racine
